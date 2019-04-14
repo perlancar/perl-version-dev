@@ -6,7 +6,6 @@ package version::dev;
 use strict 'subs', 'vars';
 use warnings;
 
-use Carp;
 use Cwd qw(abs_path);
 use Module::Path::More qw(module_path);
 use Versioning::Scheme::Perl;
@@ -48,6 +47,8 @@ sub version::dev::INC {
 
 1;
 # ABSTRACT: Set $VERSION based on version from git tags
+
+=for Pod::Coverage .+
 
 =head1 SYNOPSIS
 
