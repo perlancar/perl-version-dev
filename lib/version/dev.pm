@@ -78,7 +78,7 @@ C<$MyModule::VERSION> will be set to C<0.003_001> (if not already set).
 Sometimes you do not explicitly set C<$VERSION> in the module source code that
 you're working on. For example, you're using L<Dist::Zilla> with a plugin that
 will set C<$VERSION> during build, so only your built version of modules will
-have their C<$VERSION> set. Wen working with the unbuilt version, this sometimes
+have their C<$VERSION> set. When using the unbuilt version, this sometimes
 creates problem or annoyances when other modules or other code expect your
 module to set C<$VERSION>.
 
