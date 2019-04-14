@@ -6,6 +6,7 @@ package version::dev;
 use strict 'subs', 'vars';
 use warnings;
 
+use Carp;
 use Cwd qw(abs_path);
 use Module::Path::More qw(module_path);
 use Versioning::Scheme::Perl;
@@ -22,20 +23,16 @@ sub new {
 sub version::dev::INC {
     my ($self, $filename) = @_;
 
-    # retrieve module source code from filesystem
+    # load module from filesystem
     my $path = module_path(module => $filename) or return undef;
-    open my $fh, "<", $path or die "Cannot open $path: $!";
-    my $content = join("", <$fh>);
-    my $res = eval $content;
-    die $@ if $@;
-    die "$filename does not return a true value" unless $res;
+    { local @INC = grep { !ref || $_ != $self } @INC; require $filename }
 
     # check if the module source file is inside current working directory
-    return $res unless index(get_abs($path), get_abs(".")) >= 0;
+    return \1 unless index(abs_path($path), abs_path(".")) >= 0;
 
     # check if package defines $VERSION
     (my $pkg = $filename) =~ s!/!::!g; $pkg =~ s/\.pm\z//;
-    return $res if defined ${"$pkg\::VERSION"};
+    return \1 if defined ${"$pkg\::VERSION"};
 
     # get the most recent version tag from git
     my $found;
@@ -44,9 +41,9 @@ sub version::dev::INC {
         Versioning::Scheme::Perl->is_valid_version($tag) or next;
         ${"$pkg\::VERSION"} = Versioning::Scheme::Perl->bump_version(
             $tag, {part=>'dev'});
-        return $res;
+        return \1;
     }
-    die "Cannot find any version in `git tags`";
+    die "Cannot find any version in `git tag`";
 }
 
 1;
@@ -63,7 +60,7 @@ L<Dist::Zilla::Plugin::PkgVersion> or L<Dist::Zilla::Plugin::OurPkgVersion>):
 
 Your git tags:
 
- % git tags
+ % git tag
  v0.003
  v0.002
  v0.001
